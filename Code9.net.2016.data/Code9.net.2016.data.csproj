@@ -7,8 +7,8 @@
     <ProjectGuid>{B29F828C-413A-4278-BA5D-5001E772E00B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Code9.net._2016.DAL</RootNamespace>
-    <AssemblyName>Code9.net.2016.DAL</AssemblyName>
+    <RootNamespace>Code9.net._2016.data</RootNamespace>
+    <AssemblyName>Code9.net.2016.data</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -51,12 +51,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\Bill.cs" />
+    <Compile Include="Entities\Employee.cs" />
+    <Compile Include="Entities\EmployeeRole.cs" />
+    <Compile Include="Entities\MenuItem.cs" />
+    <Compile Include="Entities\MenuItemKind.cs" />
+    <Compile Include="Entities\OrderItem.cs" />
+    <Compile Include="IRestourantContext.cs" />
+    <Compile Include="Migrations\201604200920321_initial.cs" />
+    <Compile Include="Migrations\201604200920321_initial.Designer.cs">
+      <DependentUpon>201604200920321_initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestourantContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201604200920321_initial.resx">
+      <DependentUpon>201604200920321_initial.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

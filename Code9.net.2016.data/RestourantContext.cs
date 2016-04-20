@@ -1,10 +1,11 @@
-namespace Code9.net._2016.DAL
+namespace Code9.net._2016.data
 {
+    using Entities;
     using System;
     using System.Data.Entity;
     using System.Linq;
 
-    public class RestourantContext : DbContext
+    public class RestourantContext : DbContext, IRestourantContext
     {
         // Your context has been configured to use a 'Restourant' connection string from your application's 
         // configuration file (App.config or Web.config). By default, this connection string targets the 
@@ -17,15 +18,10 @@ namespace Code9.net._2016.DAL
         {
         }
 
-        // Add a DbSet for each entity type that you want to include in your model. For more information 
-        // on configuring and using a Code First model, see http://go.microsoft.com/fwlink/?LinkId=390109.
-
-        // public virtual DbSet<MyEntity> MyEntities { get; set; }
+        public virtual DbSet<Employee> Workers { get; set; }
+        public virtual DbSet<MenuItem> MenuItems { get; set; }
+        public virtual DbSet<OrderItem> Orders { get; set; }
+        public virtual DbSet<Bill> Bills { get; set; }
     }
 
-    //public class MyEntity
-    //{
-    //    public int Id { get; set; }
-    //    public string Name { get; set; }
-    //}
 }
