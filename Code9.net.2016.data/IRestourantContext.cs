@@ -15,6 +15,10 @@ namespace Code9.net._2016.data
         DbSet<OrderItem> Orders { get; set; }
         DbSet<Bill> Bills { get; set; }
 
+        // eager loading helpers
+        IQueryable<Bill> BillsWithOrdersWithMenu { get; }
+        IQueryable<OrderItem> OrdersWithMenu { get; }
+
         int SaveChanges();
     }
 }

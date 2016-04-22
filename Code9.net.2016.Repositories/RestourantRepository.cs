@@ -21,76 +21,58 @@ namespace Code9.net._2016.Repositories
             restourantContext = ctx;
         }
 
-        /// <summary>
-        /// Used to populate list of possible users for simple login (realy just selecting user and not real login)
-        /// </summary>
-        /// <param name="role">Role filter to display only employees for particular job</param>
-        /// <returns>list of employees matching the role filter</returns>
         public IEnumerable<Employee> GetAllWorkersForRole(EmployeeRole role)
         {
             return restourantContext.Workers
-                .Where(w => w.Role == role);
+                .Where(w => w.Role == role)
+                .ToList();
             //return from w in restourantContext.Workers
             //       where w.Role == role
             //       select w;
         }
 
-        /// <summary>
-        /// Returnes list of open orders for specified table (open meaning not payed)
-        /// </summary>
-        /// <param name="table">table number</param>
-        /// <returns>list of open orders for a table, empty list if no open orders and bill does exists, null if no open bill exists for table</returns>
         public IEnumerable<OrderItem> GetOpenOrdersForTable(int table)
         {
-            return restourantContext.Bills
+            return restourantContext.BillsWithOrdersWithMenu
                 .Where(b => b.Table == table && !b.CheckedOut)
                 .FirstOrDefault()
-                ?.Orders;
+                ?.Orders ?? new List<OrderItem>();
             //return restourantContext.Bills
             //    .Where(b => b.Table == table && !b.CheckedOut)
             //    .Select(b => b.Orders)
             //    .FirstOrDefault();
         }
 
-        /// <summary>
-        /// Returnes open orders of specified kind (used as filter for roles other than waiter)
-        /// </summary>
-        /// <param name="kind">flter used to restrict open order by kind</param>
-        /// <returns>list of open orders</returns>
         public IEnumerable<OrderItem> GetOpenOrdersForKind(MenuItemKind kind)
         {
             return restourantContext.Orders
-                .Where(order => !order.Fulfilled && order.Item.Kind == kind);
+                .Where(order => !order.Fulfilled && order.Item.Kind == kind)
+                .ToList();
         }
 
-        /// <summary>
-        /// List menu items of specified kind
-        /// </summary>
-        /// <param name="kind">kind of menu item to filter by</param>
-        /// <returns>list of menu items</returns>
         public IEnumerable<MenuItem> GetMenuForItemKind(MenuItemKind kind)
         {
-            return from m in restourantContext.MenuItems
+            return (from m in restourantContext.MenuItems
                    where m.Kind == kind
                    orderby m.DisplayName
-                   select m;
+                   select m).ToList();
             //return restourantContext.MenuItems
             //    .Where(m => m.Kind == kind)
             //    .OrderBy(m => m.DisplayName);
         }
 
-        /// <summary>
-        /// Modifies menu by adding new menu item
-        /// </summary>
-        /// <param name="name">name of item</param>
-        /// <param name="price">price of one unit of item</param>
-        /// <param name="kind">item kind</param>
-        /// <param name="worker">person making the change</param>
+        public MenuItem GetMenuItemByID(int ID)
+        {
+            return restourantContext.MenuItems
+                .Where(m => m.ID == ID)
+                .FirstOrDefault();
+        }
+
         public void AddMenuItemToMenu(string name, double price, MenuItemKind kind, Employee worker)
         {
             if (worker.Role!=EmployeeRole.BARTENDER && worker.Role!=EmployeeRole.COOK)
             {
-                throw new ArgumentException("Specified employee can't change menu", "worker");
+                throw new ArgumentException("Specified employee can't change menu", nameof(worker));
             }
             var menuItem = new MenuItem()
             {
@@ -102,29 +84,28 @@ namespace Code9.net._2016.Repositories
             restourantContext.SaveChanges();
         }
 
-        /// <summary>
-        /// Adds new order for table
-        /// </summary>
-        /// <param name="item">item being added</param>
-        /// <param name="quantity">quantity added</param>
-        /// <param name="table">table where item is being ordered</param>
-        /// <param name="worker">person serving the table</param>
-        public void AddOrderForTableByWorker(MenuItem item, int quantity, int table, Employee worker)
+        public void AddOrderForTableByWorker(int menuID, int quantity, int table, Employee worker)
         {
             if (worker.Role!=EmployeeRole.WAITER && worker.Role!=EmployeeRole.BARTENDER)
             {
-                throw new ArgumentException("Specified employee can't add orders", "worker");
+                throw new ArgumentException("Specified employee can't add orders", nameof(worker));
             }
-            var bill = restourantContext.Bills
+            var menu = restourantContext.MenuItems.Find(menuID);
+            if (menu == null)
+            {
+                throw new ArgumentException("Specified order does not exist");
+            }
+            var bill = restourantContext.BillsWithOrdersWithMenu
                 .Where(b => b.Table == table && !b.CheckedOut)
                 .OrderByDescending(b => b.UpdatedDate)
                 .FirstOrDefault();
+            var dbWorker = restourantContext.Workers.Find(worker.ID);
             if (bill == null)
             {
                 bill = new Bill()
                 {
                     Table = table,
-                    PersonServing = worker,
+                    PersonServing = dbWorker,
                     CreatedDate = DateTime.UtcNow,
                     UpdatedDate = DateTime.UtcNow,
                     Orders = new List<OrderItem>()
@@ -134,7 +115,7 @@ namespace Code9.net._2016.Repositories
 
             var order = new OrderItem()
             {
-                Item = item,
+                Item = menu,
                 Quantity = quantity
             };
             restourantContext.Orders.Add(order);
@@ -142,43 +123,58 @@ namespace Code9.net._2016.Repositories
             restourantContext.SaveChanges();
         }
 
-        /// <summary>
-        /// Complete order
-        /// </summary>
-        /// <param name="order">order being completed</param>
-        /// <param name="worker">worker completing order</param>
-        public void FulfillOrder(OrderItem order, Employee worker)
+        public void FulfillOrder(int orderID, Employee worker)
         {
             if (worker.Role==EmployeeRole.WAITER)
             {
-                throw new ArgumentException("Specified employee can't fulfill orders", "worker");
+                throw new ArgumentException("Specified employee can't fulfill orders", nameof(worker));
+            }
+            var order = restourantContext.Orders.Find(orderID);
+            if (order == null)
+            {
+                throw new ArgumentException("Specified order does not exist", nameof(orderID));
             }
             if (order.Fulfilled)
             {
-                throw new ArgumentException("order is already filfilled", "order");
+                throw new ArgumentException("Order is already filfilled", nameof(order));
             }
             order.Fulfilled = true;
             restourantContext.SaveChanges();
         }
 
-        /// <summary>
-        /// Close entire table order
-        /// </summary>
-        /// <param name="table">table whose order is being closed</param>
-        /// <param name="worker">worker completing table order</param>
+        public void DeleteOrder(int orderID, Employee worker)
+        {
+            if (worker == null)
+            {
+                throw new ArgumentNullException(nameof(worker));
+            }
+            var order = restourantContext.Orders.Find(orderID);
+            if (order == null)
+            {
+                throw new ArgumentException("Specified order does not exist", nameof(orderID));
+            }
+            if (order.Fulfilled)
+            {
+                throw new InvalidOperationException("Order is fulfilled and can't be deleted");
+            }
+            order.Quantity = 0;
+            order.Fulfilled = true;
+            restourantContext.SaveChanges();
+        }
+
         public void CheckoutTable(int table, Employee worker)
         {
             if (worker.Role != EmployeeRole.BARTENDER && worker.Role!=EmployeeRole.WAITER)
             {
-                throw new ArgumentException("Specified employee can't close table orders", "worker");
+                throw new ArgumentException("Specified employee can't close table orders", nameof(worker));
             }
-            var bill = restourantContext.Bills
+            var bill = restourantContext.BillsWithOrdersWithMenu
                 .Where(b => b.Table == table && !b.CheckedOut)
                 .FirstOrDefault();
 
             if (bill == null || bill.Orders == null || bill.Orders.Count == 0)
             {
-                throw new InvalidOperationException("table has no open orders or bills");
+                throw new InvalidOperationException("Table has no open orders or bills");
             }
 
             bill.CheckedOut = true;

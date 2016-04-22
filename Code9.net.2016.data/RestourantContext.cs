@@ -22,6 +22,21 @@ namespace Code9.net._2016.data
         public virtual DbSet<MenuItem> MenuItems { get; set; }
         public virtual DbSet<OrderItem> Orders { get; set; }
         public virtual DbSet<Bill> Bills { get; set; }
-    }
 
+        public IQueryable<Bill> BillsWithOrdersWithMenu
+        {
+            get
+            {
+                return Bills.Include(b => b.Orders.Select(o => o.Item));
+            }
+        }
+
+        public IQueryable<OrderItem> OrdersWithMenu
+        {
+            get
+            {
+                return Orders.Include(o => o.Item);
+            }
+        }
+    }
 }
