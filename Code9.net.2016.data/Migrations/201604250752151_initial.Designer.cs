@@ -13,7 +13,7 @@ namespace Code9.net._2016.data.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201604200920321_initial"; }
+            get { return "201604250752151_initial"; }
         }
         
         string IMigrationMetadata.Source

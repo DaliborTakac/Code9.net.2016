@@ -11,7 +11,8 @@ namespace Code9.net._2016.data.Entities
         public int ID { get; set; }
         public MenuItem Item { get; set; }
         public int Quantity { get; set; }
-        public bool Fulfilled { get; set; }
-        public virtual Bill Bill { get; set; }
+        public bool Delivered { get; set; }
+        public int Table { get; set; }
+        public bool Payed { get; set; }
     }
 }

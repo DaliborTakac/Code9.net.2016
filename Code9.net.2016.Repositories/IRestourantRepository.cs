@@ -1,4 +1,5 @@
 ﻿using Code9.net._2016.data.Entities;
+using Code9.net._2016.Repositories.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,14 +8,8 @@ using System.Threading.Tasks;
 
 namespace Code9.net._2016.Repositories
 {
-    public interface IRestourantRepository
+    public interface IRestourantRepository : IDisposable
     {
-        /// <summary>
-        /// Used to populate list of possible users for simple login (realy just selecting user and not real login)
-        /// </summary>
-        /// <param name="role">Role filter to display only employees for particular job</param>
-        /// <returns>list of employees matching the role filter</returns>
-        IEnumerable<Employee> GetAllWorkersForRole(EmployeeRole role);
 
         /// <summary>
         /// Returnes list of open orders for specified table (open meaning not payed)
@@ -51,35 +46,34 @@ namespace Code9.net._2016.Repositories
         /// <param name="price">price of one unit of item</param>
         /// <param name="kind">item kind</param>
         /// <param name="worker">person making the change</param>
-        void AddMenuItemToMenu(string name, double price, MenuItemKind kind, Employee worker);
+        void AddMenuItemToMenu(string name, double price, MenuItemKind kind, EmployeeRole worker);
 
         /// <summary>
-        /// Adds new order for table
+        /// Adds new orders for table
         /// </summary>
-        /// <param name="item">item being added</param>
-        /// <param name="quantity">quantity added</param>
-        /// <param name="table">table where item is being ordered</param>
+        /// <param name="orders">set of orders that are being added</param>
+        /// <param name="table">table where items are being ordered</param>
         /// <param name="worker">person serving the table</param>
-        void AddOrderForTableByWorker(int menuID, int quantity, int table, Employee worker);
+        void AddOrdersForTableByWorker(IEnumerable<SubmittedOrderItem> orders, int table, EmployeeRole worker);
 
         /// <summary>
         /// Delete specified order
         /// </summary>
         /// <param name="iD">id of order to delete</param>
-        void DeleteOrder(int iD, Employee worker);
+        void DeleteOrder(int iD, EmployeeRole worker);
 
         /// <summary>
-        /// Complete order
+        /// Complete order, by indicating that order is ready to be delivered, prevents canceling order
         /// </summary>
         /// <param name="order">order being completed</param>
         /// <param name="worker">worker completing order</param>
-        void FulfillOrder(int ID, Employee worker);
+        void FulfillOrder(int ID, EmployeeRole worker);
 
         /// <summary>
         /// Close entire table order
         /// </summary>
         /// <param name="table">table whose order is being closed</param>
         /// <param name="worker">worker completing table order</param>
-        void CheckoutTable(int table, Employee worker);
+        void CheckoutTable(int table, EmployeeRole worker);
     }
 }

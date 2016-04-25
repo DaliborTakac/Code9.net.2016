@@ -8,15 +8,12 @@ using System.Threading.Tasks;
 
 namespace Code9.net._2016.data
 {
-    public interface IRestourantContext
+    public interface IRestourantContext : IDisposable
     {
-        DbSet<Employee> Workers { get; set; }
         DbSet<MenuItem> MenuItems { get; set; }
         DbSet<OrderItem> Orders { get; set; }
-        DbSet<Bill> Bills { get; set; }
 
         // eager loading helpers
-        IQueryable<Bill> BillsWithOrdersWithMenu { get; }
         IQueryable<OrderItem> OrdersWithMenu { get; }
 
         int SaveChanges();

@@ -1,5 +1,6 @@
 ﻿using Code9.net._2016.data;
 using Code9.net._2016.data.Entities;
+using Code9.net._2016.Repositories.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Code9.net._2016.Repositories
 {
-    public class RestourantRepository : IRestourantRepository
+    public class RestourantRepository : IRestourantRepository, IDisposable
     {
         protected IRestourantContext restourantContext;
 
@@ -21,32 +22,17 @@ namespace Code9.net._2016.Repositories
             restourantContext = ctx;
         }
 
-        public IEnumerable<Employee> GetAllWorkersForRole(EmployeeRole role)
-        {
-            return restourantContext.Workers
-                .Where(w => w.Role == role)
-                .ToList();
-            //return from w in restourantContext.Workers
-            //       where w.Role == role
-            //       select w;
-        }
-
         public IEnumerable<OrderItem> GetOpenOrdersForTable(int table)
         {
-            return restourantContext.BillsWithOrdersWithMenu
-                .Where(b => b.Table == table && !b.CheckedOut)
-                .FirstOrDefault()
-                ?.Orders ?? new List<OrderItem>();
-            //return restourantContext.Bills
-            //    .Where(b => b.Table == table && !b.CheckedOut)
-            //    .Select(b => b.Orders)
-            //    .FirstOrDefault();
+            return restourantContext.OrdersWithMenu
+                .Where(order => order.Table == table && !order.Payed)
+                .ToList();
         }
 
         public IEnumerable<OrderItem> GetOpenOrdersForKind(MenuItemKind kind)
         {
-            return restourantContext.Orders
-                .Where(order => !order.Fulfilled && order.Item.Kind == kind)
+            return restourantContext.OrdersWithMenu
+                .Where(order => !order.Delivered && order.Item.Kind == kind)
                 .ToList();
         }
 
@@ -64,13 +50,12 @@ namespace Code9.net._2016.Repositories
         public MenuItem GetMenuItemByID(int ID)
         {
             return restourantContext.MenuItems
-                .Where(m => m.ID == ID)
-                .FirstOrDefault();
+                .Find(ID);
         }
 
-        public void AddMenuItemToMenu(string name, double price, MenuItemKind kind, Employee worker)
+        public void AddMenuItemToMenu(string name, double price, MenuItemKind kind, EmployeeRole worker)
         {
-            if (worker.Role!=EmployeeRole.BARTENDER && worker.Role!=EmployeeRole.COOK)
+            if (worker!=EmployeeRole.BARTENDER && worker!=EmployeeRole.COOK)
             {
                 throw new ArgumentException("Specified employee can't change menu", nameof(worker));
             }
@@ -84,48 +69,34 @@ namespace Code9.net._2016.Repositories
             restourantContext.SaveChanges();
         }
 
-        public void AddOrderForTableByWorker(int menuID, int quantity, int table, Employee worker)
+        public void AddOrdersForTableByWorker(IEnumerable<SubmittedOrderItem> orders, int table, EmployeeRole worker)
         {
-            if (worker.Role!=EmployeeRole.WAITER && worker.Role!=EmployeeRole.BARTENDER)
+            if (worker!=EmployeeRole.WAITER && worker!=EmployeeRole.BARTENDER)
             {
                 throw new ArgumentException("Specified employee can't add orders", nameof(worker));
             }
-            var menu = restourantContext.MenuItems.Find(menuID);
-            if (menu == null)
+            foreach (var item in orders)
             {
-                throw new ArgumentException("Specified order does not exist");
-            }
-            var bill = restourantContext.BillsWithOrdersWithMenu
-                .Where(b => b.Table == table && !b.CheckedOut)
-                .OrderByDescending(b => b.UpdatedDate)
-                .FirstOrDefault();
-            var dbWorker = restourantContext.Workers.Find(worker.ID);
-            if (bill == null)
-            {
-                bill = new Bill()
+                var menu = restourantContext.MenuItems.Find(item.MenuItemID);
+                if (menu == null)
                 {
-                    Table = table,
-                    PersonServing = dbWorker,
-                    CreatedDate = DateTime.UtcNow,
-                    UpdatedDate = DateTime.UtcNow,
-                    Orders = new List<OrderItem>()
-                };
-                restourantContext.Bills.Add(bill);
-            }
+                    throw new ArgumentException("Specified menu item does not exist id = " + item.MenuItemID);
+                }
 
-            var order = new OrderItem()
-            {
-                Item = menu,
-                Quantity = quantity
-            };
-            restourantContext.Orders.Add(order);
-            bill.Orders.Add(order);
+                var orderItem = new OrderItem()
+                {
+                    Item = menu,
+                    Quantity = item.Quantity,
+                    Table = table
+                };
+                restourantContext.Orders.Add(orderItem);
+            }
             restourantContext.SaveChanges();
         }
 
-        public void FulfillOrder(int orderID, Employee worker)
+        public void FulfillOrder(int orderID, EmployeeRole worker)
         {
-            if (worker.Role==EmployeeRole.WAITER)
+            if (worker==EmployeeRole.COOK)
             {
                 throw new ArgumentException("Specified employee can't fulfill orders", nameof(worker));
             }
@@ -134,58 +105,52 @@ namespace Code9.net._2016.Repositories
             {
                 throw new ArgumentException("Specified order does not exist", nameof(orderID));
             }
-            if (order.Fulfilled)
+            if (order.Delivered)
             {
                 throw new ArgumentException("Order is already filfilled", nameof(order));
             }
-            order.Fulfilled = true;
+            order.Delivered = true;
             restourantContext.SaveChanges();
         }
 
-        public void DeleteOrder(int orderID, Employee worker)
+        public void DeleteOrder(int orderID, EmployeeRole worker)
         {
-            if (worker == null)
-            {
-                throw new ArgumentNullException(nameof(worker));
-            }
             var order = restourantContext.Orders.Find(orderID);
             if (order == null)
             {
                 throw new ArgumentException("Specified order does not exist", nameof(orderID));
             }
-            if (order.Fulfilled)
+            if (order.Delivered)
             {
                 throw new InvalidOperationException("Order is fulfilled and can't be deleted");
             }
             order.Quantity = 0;
-            order.Fulfilled = true;
+            order.Delivered = true;
             restourantContext.SaveChanges();
         }
 
-        public void CheckoutTable(int table, Employee worker)
+        public void CheckoutTable(int table, EmployeeRole worker)
         {
-            if (worker.Role != EmployeeRole.BARTENDER && worker.Role!=EmployeeRole.WAITER)
+            if (worker != EmployeeRole.BARTENDER && worker!=EmployeeRole.WAITER)
             {
                 throw new ArgumentException("Specified employee can't close table orders", nameof(worker));
             }
-            var bill = restourantContext.BillsWithOrdersWithMenu
-                .Where(b => b.Table == table && !b.CheckedOut)
-                .FirstOrDefault();
-
-            if (bill == null || bill.Orders == null || bill.Orders.Count == 0)
+            var orders = restourantContext.Orders
+                .Where(order => order.Table == table && !order.Payed).ToList();
+            if (orders.Count==0)
             {
-                throw new InvalidOperationException("Table has no open orders or bills");
+                throw new InvalidOperationException("No orders for specified table");
             }
-
-            bill.CheckedOut = true;
-            foreach (var item in bill.Orders)
+            foreach (var order in orders)
             {
-                if (!item.Fulfilled)
-                {
-                    item.Fulfilled = true;
-                }
+                order.Payed = true;
             }
             restourantContext.SaveChanges();
+        }
+
+        public void Dispose()
+        {
+            restourantContext.Dispose();
         }
     }
 }

@@ -14,34 +14,6 @@ namespace Code9.net._2016.data.Migrations
 
         protected override void Seed(Code9.net._2016.data.RestourantContext context)
         {
-            if (context.Workers.Count() == 0)
-            {
-                context.Workers.AddOrUpdate(new Entities.Employee()
-                {
-                    Name = "Waiter 1",
-                    Role = Entities.EmployeeRole.WAITER
-                });
-                context.Workers.AddOrUpdate(new Entities.Employee()
-                {
-                    Name = "Waiter 2",
-                    Role = Entities.EmployeeRole.WAITER
-                });
-                context.Workers.AddOrUpdate(new Entities.Employee()
-                {
-                    Name = "Waiter 3",
-                    Role = Entities.EmployeeRole.WAITER
-                });
-                context.Workers.AddOrUpdate(new Entities.Employee()
-                {
-                    Name = "Bartender 1",
-                    Role = Entities.EmployeeRole.BARTENDER
-                });
-                context.Workers.AddOrUpdate(new Entities.Employee()
-                {
-                    Name = "Cook 1",
-                    Role = Entities.EmployeeRole.COOK
-                });
-            }
             if (context.MenuItems.Count() == 0)
             {
                 context.MenuItems.AddOrUpdate(new Entities.MenuItem()

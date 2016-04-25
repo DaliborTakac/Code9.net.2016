@@ -51,20 +51,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\Bill.cs" />
-    <Compile Include="Entities\Employee.cs" />
     <Compile Include="Entities\EmployeeRole.cs" />
     <Compile Include="Entities\MenuItem.cs" />
     <Compile Include="Entities\MenuItemKind.cs" />
     <Compile Include="Entities\OrderItem.cs" />
     <Compile Include="IRestourantContext.cs" />
-    <Compile Include="Migrations\201604200920321_initial.cs" />
-    <Compile Include="Migrations\201604200920321_initial.Designer.cs">
-      <DependentUpon>201604200920321_initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201604220726028_MenuItem_adding_active_property.cs" />
-    <Compile Include="Migrations\201604220726028_MenuItem_adding_active_property.Designer.cs">
-      <DependentUpon>201604220726028_MenuItem_adding_active_property.cs</DependentUpon>
+    <Compile Include="Migrations\201604250752151_initial.cs" />
+    <Compile Include="Migrations\201604250752151_initial.Designer.cs">
+      <DependentUpon>201604250752151_initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -75,11 +69,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201604200920321_initial.resx">
-      <DependentUpon>201604200920321_initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201604220726028_MenuItem_adding_active_property.resx">
-      <DependentUpon>201604220726028_MenuItem_adding_active_property.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201604250752151_initial.resx">
+      <DependentUpon>201604250752151_initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

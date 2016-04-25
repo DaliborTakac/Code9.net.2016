@@ -9,63 +9,6 @@ namespace Code9.net._2016.Repositories.TEST
     [TestClass]
     public class RestourantRepositoryTests
     {
-        #region GetAllWorkersForRole tests
-        [TestMethod]
-        public void GetAllWorkersForRole_returns_no_items_if_no_workers_match()
-        {
-            var mockContext = new MockDBContextFactory().Create(); // empty list for all DbSets, including workers
-
-            var repository = new RestourantRepository(mockContext);
-
-            var waiters = repository.GetAllWorkersForRole(EmployeeRole.WAITER);
-            var bartenders = repository.GetAllWorkersForRole(EmployeeRole.BARTENDER);
-            var cooks = repository.GetAllWorkersForRole(EmployeeRole.COOK);
-
-            Assert.AreEqual(0, waiters.Count());
-            Assert.AreEqual(0, bartenders.Count());
-            Assert.AreEqual(0, cooks.Count());
-        }
-
-        [TestMethod]
-        public void GetAllWorkersForRole_returns_one_for_each_specified_role()
-        {
-            var workers = new List<Employee>();
-            workers.Add(new Employee()
-            {
-                Name = "Bob",
-                Role = EmployeeRole.BARTENDER,
-                ID = 1
-            });
-            workers.Add(new Employee()
-            {
-                Name = "Alice",
-                Role = EmployeeRole.COOK,
-                ID = 2
-            });
-            workers.Add(new Employee()
-            {
-                Name = "Charlie",
-                Role = EmployeeRole.WAITER,
-                ID = 3
-            });
-
-            var mockContext = new MockDBContextFactory().WithBuiltinWorkers(workers).Create();
-
-            var repository = new RestourantRepository(mockContext);
-
-            var waiters = repository.GetAllWorkersForRole(EmployeeRole.WAITER);
-            var bartenders = repository.GetAllWorkersForRole(EmployeeRole.BARTENDER);
-            var cooks = repository.GetAllWorkersForRole(EmployeeRole.COOK);
-
-            Assert.AreEqual(1, waiters.Count());
-            Assert.AreEqual(1, bartenders.Count());
-            Assert.AreEqual(1, cooks.Count());
-
-            Assert.AreEqual(3, waiters.First().ID);
-            Assert.AreEqual(1, bartenders.First().ID);
-            Assert.AreEqual(2, cooks.First().ID);
-        }
-        #endregion GetAllWorkersForRole
 
         #region GetOpenOrdersForTable
         [TestMethod]
@@ -77,59 +20,23 @@ namespace Code9.net._2016.Repositories.TEST
                 ID = 1,
                 Item = null,
                 Quantity = 1,
-                Fulfilled = true,
+                Delivered = true,
             });
             orders.Add(new OrderItem()
             {
                 ID = 2,
                 Item = null,
                 Quantity = 10,
-                Fulfilled = true,
+                Delivered = true,
             });
 
-            var bills = new List<Bill>();
-            bills.Add(new Bill()
-            {
-                ID = 1,
-                Table = 4,
-                CheckedOut = true,
-                Orders = new List<OrderItem>() { orders[0], orders[1] },
-                PersonServing = null,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now
-            });
-
-            var mockContext = new MockDBContextFactory().WithBuiltinOrderItems(orders).WithBuiltinBills(bills).Create();
+            var mockContext = new MockDBContextFactory().WithBuiltinOrderItems(orders).Create();
 
             var repository = new RestourantRepository(mockContext);
 
             var openOrder = repository.GetOpenOrdersForTable(4);
 
             Assert.AreEqual(0, openOrder.Count());
-        }
-
-        [TestMethod]
-        public void GetOpenOrdersForTable_returns_empty_results_when_no_open_orders()
-        {
-            var bills = new List<Bill>();
-            bills.Add(new Bill()
-            {
-                ID = 1,
-                Table = 4,
-                CheckedOut = false,
-                Orders = new List<OrderItem>(),
-                PersonServing = null,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now
-            });
-
-            var mockContext = new MockDBContextFactory().WithBuiltinBills(bills).Create();
-
-            var repository = new RestourantRepository(mockContext);
-
-            var openOrders = repository.GetOpenOrdersForTable(4);
-
-            Assert.AreEqual(0, openOrders.Count());
         }
 
         [TestMethod]
@@ -141,39 +48,19 @@ namespace Code9.net._2016.Repositories.TEST
                 ID = 5,
                 Item = null,
                 Quantity = 1,
-                Fulfilled = true,
+                Delivered = false,
+                Table = 4
             });
             orders.Add(new OrderItem()
             {
                 ID = 2,
                 Item = null,
                 Quantity = 10,
-                Fulfilled = true,
+                Delivered = false,
+                Table = 6
             });
 
-            var bills = new List<Bill>();
-            bills.Add(new Bill()
-            {
-                ID = 1,
-                Table = 4,
-                CheckedOut = false,
-                Orders = new List<OrderItem>() { orders[0] },
-                PersonServing = null,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now
-            });
-            bills.Add(new Bill()
-            {
-                ID = 2,
-                Table = 2,
-                CheckedOut = true,
-                Orders = new List<OrderItem>() { orders[1] },
-                PersonServing = null,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now
-            });
-
-            var mockContext = new MockDBContextFactory().WithBuiltinOrderItems(orders).WithBuiltinBills(bills).Create();
+            var mockContext = new MockDBContextFactory().WithBuiltinOrderItems(orders).Create();
 
             var repository = new RestourantRepository(mockContext);
 
@@ -203,8 +90,7 @@ namespace Code9.net._2016.Repositories.TEST
                 ID = 5,
                 Item = menu[0],
                 Quantity = 2,
-                Fulfilled = true,
-                Bill = null
+                Delivered = true
             });
 
             var mockContext = new MockDBContextFactory().WithBuiltinMenuItems(menu).WithBuiltinOrderItems(orders).Create();
@@ -234,16 +120,14 @@ namespace Code9.net._2016.Repositories.TEST
                 ID = 5,
                 Item = menu[0],
                 Quantity = 2,
-                Fulfilled = true,
-                Bill = null
+                Delivered = true
             });
             orders.Add(new OrderItem()
             {
                 ID = 8,
                 Item = menu[0],
                 Quantity = 2,
-                Fulfilled = false,
-                Bill = null
+                Delivered = false
             });
 
             var mockContext = new MockDBContextFactory().WithBuiltinMenuItems(menu).WithBuiltinOrderItems(orders).Create();
@@ -350,7 +234,7 @@ namespace Code9.net._2016.Repositories.TEST
 
             var repository = new RestourantRepository(mockContext);
 
-            repository.AddMenuItemToMenu("invalid operation generating item", 5.00, MenuItemKind.DRINK, new Employee() { Role = EmployeeRole.WAITER });
+            repository.AddMenuItemToMenu("invalid operation generating item", 5.00, MenuItemKind.DRINK, EmployeeRole.WAITER);
         }
 
         [TestMethod]
@@ -363,7 +247,7 @@ namespace Code9.net._2016.Repositories.TEST
 
             const string validItem1 = "valid item";
 
-            repository.AddMenuItemToMenu(validItem1, 10.00, MenuItemKind.DRINK, new Employee() { Role = EmployeeRole.BARTENDER });
+            repository.AddMenuItemToMenu(validItem1, 10.00, MenuItemKind.DRINK, EmployeeRole.BARTENDER);
 
             Assert.AreEqual(1, mockContext.MenuItems.Count());
             Assert.AreEqual(validItem1, mockContext.MenuItems.Last().DisplayName);
@@ -373,7 +257,7 @@ namespace Code9.net._2016.Repositories.TEST
 
             const string validItem2 = "another valid item";
 
-            repository.AddMenuItemToMenu(validItem2, 97.99, MenuItemKind.MEAL, new Employee() { Role = EmployeeRole.COOK });
+            repository.AddMenuItemToMenu(validItem2, 97.99, MenuItemKind.MEAL, EmployeeRole.COOK);
 
             Assert.AreEqual(2, mockContext.MenuItems.Count());
             Assert.AreEqual(validItem2, mockContext.MenuItems.Last().DisplayName);
@@ -391,7 +275,7 @@ namespace Code9.net._2016.Repositories.TEST
             const double itemPrice = 19.99;
             const MenuItemKind itemKind = MenuItemKind.DRINK;
 
-            repository.AddMenuItemToMenu(itemName, itemPrice, itemKind, new Employee() { Role = EmployeeRole.BARTENDER });
+            repository.AddMenuItemToMenu(itemName, itemPrice, itemKind, EmployeeRole.BARTENDER);
 
             var inserted = mockContext.MenuItems.Last();
 
@@ -404,7 +288,7 @@ namespace Code9.net._2016.Repositories.TEST
         #region AddOrderForTableByWorker
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void AddOrderForTableByWorker_failes_when_worker_is_cook()
+        public void AddOrdersForTableByWorker_failes_when_worker_is_cook()
         {
             var menu = new List<MenuItem>();
             menu.Add(new MenuItem()
@@ -419,12 +303,15 @@ namespace Code9.net._2016.Repositories.TEST
 
             var repository = new RestourantRepository(mockContext);
 
-            repository.AddOrderForTableByWorker(menu[0].ID, 1, 1, new Employee() { Role = EmployeeRole.COOK });
+            var orders = new List<Models.SubmittedOrderItem>();
+            orders.Add(new Models.SubmittedOrderItem() { MenuItemID = menu[0].ID, Quantity = 1 });
+
+            repository.AddOrdersForTableByWorker(orders, 1, EmployeeRole.COOK);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void AddOrderForTableByWorker_failes_when_invalid_order_id_specified()
+        public void AddOrdersForTableByWorker_failes_when_invalid_order_id_specified()
         {
             var menu = new List<MenuItem>();
             menu.Add(new MenuItem()
@@ -439,99 +326,14 @@ namespace Code9.net._2016.Repositories.TEST
 
             var repository = new RestourantRepository(mockContext);
 
-            repository.AddOrderForTableByWorker(15, 1, 1, new Employee() { Role = EmployeeRole.WAITER });
+            var orders = new List<Models.SubmittedOrderItem>();
+            orders.Add(new Models.SubmittedOrderItem() { MenuItemID = 15, Quantity = 1 });
+
+            repository.AddOrdersForTableByWorker(orders, 1, EmployeeRole.WAITER);
         }
 
         [TestMethod]
-        public void AddOrderForTableByWorker_creates_new_bill_if_one_does_not_exists()
-        {
-            var menu = new List<MenuItem>();
-            menu.Add(new MenuItem()
-            {
-                ID = 1,
-                DisplayName = "menu item",
-                Price = 19.95,
-                Kind = MenuItemKind.MEAL
-            });
-
-            var mockContext = new MockDBContextFactory().WithBuiltinMenuItems(menu).Create();
-            var repository = new RestourantRepository(mockContext);
-
-            repository.AddOrderForTableByWorker(menu[0].ID, 1, 1, new Employee() { Role = EmployeeRole.WAITER });
-
-            Assert.AreEqual(1, mockContext.Bills.Count());
-        }
-
-        [TestMethod]
-        public void AddOrderForTableByWorker_reuses_existing_bill_for_table_if_not_checked_out()
-        {
-            var menu = new List<MenuItem>();
-            menu.Add(new MenuItem()
-            {
-                ID = 1,
-                DisplayName = "menu item",
-                Price = 19.95,
-                Kind = MenuItemKind.MEAL
-            });
-
-            var bills = new List<Bill>();
-            bills.Add(new Bill()
-            {
-                ID = 1,
-                Table = 4,
-                CheckedOut = false,
-                Orders = new List<OrderItem>(),
-                CreatedDate = DateTime.UtcNow,
-                UpdatedDate = DateTime.UtcNow
-            });
-
-            var mockContext = new MockDBContextFactory().WithBuiltinMenuItems(menu).WithBuiltinBills(bills).Create();
-
-            var repository = new RestourantRepository(mockContext);
-
-            var numBils = bills.Count;
-
-            repository.AddOrderForTableByWorker(menu[0].ID, 1, 4, new Employee() { Role = EmployeeRole.BARTENDER });
-
-            Assert.AreEqual(numBils, bills.Count);
-        }
-
-        [TestMethod]
-        public void AddOrderForTableByWorker_adds_new_bill_if_existing_does_not_maches_table()
-        {
-            var menu = new List<MenuItem>();
-            menu.Add(new MenuItem()
-            {
-                ID = 1,
-                DisplayName = "menu item",
-                Price = 19.95,
-                Kind = MenuItemKind.MEAL
-            });
-
-            var bills = new List<Bill>();
-            bills.Add(new Bill()
-            {
-                ID = 1,
-                Table = 4,
-                CheckedOut = false,
-                Orders = new List<OrderItem>(),
-                CreatedDate = DateTime.UtcNow,
-                UpdatedDate = DateTime.UtcNow
-            });
-
-            var mockContext = new MockDBContextFactory().WithBuiltinMenuItems(menu).WithBuiltinBills(bills).Create();
-
-            var repository = new RestourantRepository(mockContext);
-
-            var numBils = bills.Count;
-
-            repository.AddOrderForTableByWorker(menu[0].ID, 1, 3, new Employee() { Role = EmployeeRole.BARTENDER });
-
-            Assert.AreNotEqual(numBils, bills.Count);
-        }
-
-        [TestMethod]
-        public void AddOrderForTableByWorker_persists_data_by_calling_save_changes_on_db_context()
+        public void AddOrdersForTableByWorker_persists_data_by_calling_save_changes_on_db_context()
         {
             var menu = new List<MenuItem>();
             menu.Add(new MenuItem()
@@ -548,32 +350,35 @@ namespace Code9.net._2016.Repositories.TEST
 
             var repository = new RestourantRepository(mockContext);
 
-            repository.AddOrderForTableByWorker(menu[0].ID, 1, 1, new Employee() { Role = EmployeeRole.WAITER });
+            var orders = new List<Models.SubmittedOrderItem>();
+            orders.Add(new Models.SubmittedOrderItem() { MenuItemID = menu[0].ID, Quantity = 1 });
+
+            repository.AddOrdersForTableByWorker(orders, 1, EmployeeRole.WAITER);
 
             Assert.AreEqual(1, numSaveCalls);
+            Assert.AreEqual(menu[0].ID, mockContext.OrdersWithMenu.First().Item.ID);
         }
         #endregion AddOrderForTableByWorker
 
         #region FulfillOrder
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void FulfillOrder_failes_when_worker_is_waiter()
+        public void FulfillOrder_failes_when_worker_is_cook()
         {
             var orders = new List<OrderItem>();
             orders.Add(new OrderItem()
             {
                 ID = 1,
-                Fulfilled = false,
+                Delivered = false,
                 Item = null,
-                Quantity = 1,
-                Bill = null
+                Quantity = 1
             });
 
             var mockContext = new MockDBContextFactory().WithBuiltinOrderItems(orders).Create();
 
             var repository = new RestourantRepository(mockContext);
 
-            repository.FulfillOrder(orders[0].ID, new Employee() { Role = EmployeeRole.WAITER });
+            repository.FulfillOrder(orders[0].ID, EmployeeRole.COOK);
         }
 
         [TestMethod]
@@ -584,17 +389,16 @@ namespace Code9.net._2016.Repositories.TEST
             orders.Add(new OrderItem()
             {
                 ID = 1,
-                Fulfilled = true,
+                Delivered = true,
                 Item = null,
-                Quantity = 1,
-                Bill = null
+                Quantity = 1
             });
 
             var mockContext = new MockDBContextFactory().WithBuiltinOrderItems(orders).Create();
 
             var repository = new RestourantRepository(mockContext);
 
-            repository.FulfillOrder(orders[0].ID, new Employee() { Role = EmployeeRole.WAITER });
+            repository.FulfillOrder(orders[0].ID, EmployeeRole.WAITER);
         }
 
         [TestMethod]
@@ -605,30 +409,28 @@ namespace Code9.net._2016.Repositories.TEST
             orders.Add(new OrderItem()
             {
                 ID = 1,
-                Fulfilled = true,
+                Delivered = true,
                 Item = null,
-                Quantity = 1,
-                Bill = null
+                Quantity = 1
             });
 
             var mockContext = new MockDBContextFactory().WithBuiltinOrderItems(orders).Create();
 
             var repository = new RestourantRepository(mockContext);
 
-            repository.FulfillOrder(15, new Employee() { Role = EmployeeRole.WAITER });
+            repository.FulfillOrder(15, EmployeeRole.WAITER);
         }
 
         [TestMethod]
-        public void FulfillOrder_succeeds_for_bartender_and_cook_and_calls_save_changes()
+        public void FulfillOrder_succeeds_for_bartender_and_waiter_and_calls_save_changes()
         {
             var orders = new List<OrderItem>();
             orders.Add(new OrderItem()
             {
                 ID = 1,
-                Fulfilled = false,
+                Delivered = false,
                 Item = null,
-                Quantity = 1,
-                Bill = null
+                Quantity = 1
             });
 
             var numSaveCalls = 0;
@@ -637,41 +439,22 @@ namespace Code9.net._2016.Repositories.TEST
 
             var repository = new RestourantRepository(mockContext);
 
-            repository.FulfillOrder(orders[0].ID, new Employee() { Role = EmployeeRole.BARTENDER });
+            repository.FulfillOrder(orders[0].ID, EmployeeRole.BARTENDER);
 
-            Assert.IsTrue(orders[0].Fulfilled);
+            Assert.IsTrue(orders[0].Delivered);
             Assert.AreEqual(1, numSaveCalls);
 
             numSaveCalls = 0;
-            orders[0].Fulfilled = false;
+            orders[0].Delivered = false;
 
-            repository.FulfillOrder(orders[0].ID, new Employee() { Role = EmployeeRole.COOK });
+            repository.FulfillOrder(orders[0].ID, EmployeeRole.WAITER);
 
-            Assert.IsTrue(orders[0].Fulfilled);
+            Assert.IsTrue(orders[0].Delivered);
             Assert.AreEqual(1, numSaveCalls);
         }
         #endregion FulfillOrder
 
         #region DeleteOrder
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void DeleteOrder_failes_if_worker_is_null()
-        {
-            var orders = new List<OrderItem>();
-            orders.Add(new OrderItem()
-            {
-                ID = 1,
-                Quantity = 2,
-                Fulfilled = false
-            });
-
-            var context = new MockDBContextFactory().WithBuiltinOrderItems(orders).Create();
-
-            var repository = new RestourantRepository(context);
-
-            repository.DeleteOrder(1, null);
-        }
-
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void DeleteOrder_failes_if_order_id_invalid()
@@ -681,14 +464,14 @@ namespace Code9.net._2016.Repositories.TEST
             {
                 ID = 1,
                 Quantity = 2,
-                Fulfilled = false
+                Delivered = false
             });
 
             var context = new MockDBContextFactory().WithBuiltinOrderItems(orders).Create();
 
             var repository = new RestourantRepository(context);
 
-            repository.DeleteOrder(4, new Employee() { Role = EmployeeRole.WAITER });
+            repository.DeleteOrder(4, EmployeeRole.WAITER);
         }
 
         [TestMethod]
@@ -700,14 +483,14 @@ namespace Code9.net._2016.Repositories.TEST
             {
                 ID = 1,
                 Quantity = 2,
-                Fulfilled = true
+                Delivered = true
             });
 
             var context = new MockDBContextFactory().WithBuiltinOrderItems(orders).Create();
 
             var repository = new RestourantRepository(context);
 
-            repository.DeleteOrder(1, new Employee() { Role = EmployeeRole.WAITER });
+            repository.DeleteOrder(1, EmployeeRole.WAITER);
         }
 
         [TestMethod]
@@ -718,7 +501,7 @@ namespace Code9.net._2016.Repositories.TEST
             {
                 ID = 6,
                 Quantity = 2,
-                Fulfilled = false
+                Delivered = false
             });
 
             var numSaveCalls = 0;
@@ -727,10 +510,10 @@ namespace Code9.net._2016.Repositories.TEST
 
             var repository = new RestourantRepository(context);
 
-            repository.DeleteOrder(6, new Employee() { Role = EmployeeRole.WAITER });
+            repository.DeleteOrder(6, EmployeeRole.WAITER);
 
             Assert.AreEqual(0, orders[0].Quantity);
-            Assert.IsTrue(orders[0].Fulfilled);
+            Assert.IsTrue(orders[0].Delivered);
             Assert.AreEqual(1, numSaveCalls);
         }
         #endregion DeleteOrder
@@ -740,99 +523,75 @@ namespace Code9.net._2016.Repositories.TEST
         [ExpectedException(typeof(ArgumentException))]
         public void CheckoutTable_failes_when_worker_is_cook()
         {
-            var bills = new List<Bill>();
-            bills.Add(new Bill()
-            {
-                ID = 1,
-                Table = 1,
-                CheckedOut = false,
-                Orders = new List<OrderItem>()
-            });
 
-            var mockContext = new MockDBContextFactory().WithBuiltinBills(bills).Create();
-
-            var repository = new RestourantRepository(mockContext);
-
-            repository.CheckoutTable(1, new Employee() { Role = EmployeeRole.COOK });
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void CheckoutTable_failes_when_no_bill()
-        {
             var mockContext = new MockDBContextFactory().Create();
+
             var repository = new RestourantRepository(mockContext);
 
-            repository.CheckoutTable(1, new Employee() { Role = EmployeeRole.WAITER });
+            repository.CheckoutTable(1, EmployeeRole.COOK);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void CheckoutTable_failes_when_no_orders_for_table()
         {
-            var bills = new List<Bill>();
-            bills.Add(new Bill()
-            {
-                ID = 1,
-                Table = 1,
-                CheckedOut = false,
-                Orders = new List<OrderItem>()
-            });
-            var mockContext = new MockDBContextFactory().WithBuiltinBills(bills).Create();
+            var mockContext = new MockDBContextFactory().Create();
             var repository = new RestourantRepository(mockContext);
 
-            repository.CheckoutTable(1, new Employee() { Role = EmployeeRole.BARTENDER });
+            repository.CheckoutTable(1, EmployeeRole.BARTENDER);
         }
 
         [TestMethod]
         public void CheckoutTable_succeeds_for_bartender_and_waiter()
         {
-            var bills = new List<Bill>();
-            bills.Add(new Bill()
+            var orders = new List<OrderItem>()
             {
-                ID = 1,
-                Table = 1,
-                CheckedOut = false,
-                Orders = new List<OrderItem>()
-            });
-            bills[0].Orders.Add(new OrderItem());
+                new OrderItem()
+                {
+                    Table = 1, Quantity = 3
+                },
+                new OrderItem()
+                {
+                    Table = 2, Quantity = 2
+                }
+            };
 
-            var mockContext = new MockDBContextFactory().WithBuiltinBills(bills).Create();
+            var mockContext = new MockDBContextFactory().WithBuiltinOrderItems(orders).Create();
 
             var repository = new RestourantRepository(mockContext);
 
-            repository.CheckoutTable(1, new Employee() { Role = EmployeeRole.BARTENDER });
+            repository.CheckoutTable(1, EmployeeRole.BARTENDER);
 
-            Assert.IsTrue(bills[0].CheckedOut);
+            Assert.IsTrue(orders[0].Payed);
+            Assert.IsFalse(orders[1].Payed);
 
-            bills[0].CheckedOut = false;
-            bills[0].Orders.First().Fulfilled = false;
+            orders[0].Payed = false;
 
-            repository.CheckoutTable(1, new Employee() { Role = EmployeeRole.WAITER });
+            repository.CheckoutTable(2, EmployeeRole.WAITER);
 
-            Assert.IsTrue(bills[0].CheckedOut);
+            Assert.IsFalse(orders[0].Payed);
+            Assert.IsTrue(orders[1].Payed);
         }
 
         [TestMethod]
         public void CheckoutTable_calls_save_changes()
         {
-            var bills = new List<Bill>();
-            bills.Add(new Bill()
+            var orders = new List<OrderItem>(0)
             {
-                ID = 1,
-                Table = 1,
-                CheckedOut = false,
-                Orders = new List<OrderItem>()
-            });
-            bills[0].Orders.Add(new OrderItem());
+                new OrderItem()
+                {
+                    Table = 2,
+                    Quantity = 10
+                }
+            };
 
             var numSaveCalls = 0;
 
-            var mockContext = new MockDBContextFactory().WithBuiltinBills(bills).WithSaveChangesCallback(() => ++numSaveCalls).Create();
+            var mockContext = new MockDBContextFactory().WithBuiltinOrderItems(orders).WithSaveChangesCallback(() => ++numSaveCalls).Create();
 
             var repository = new RestourantRepository(mockContext);
 
-            repository.CheckoutTable(1, new Employee() { Role = EmployeeRole.BARTENDER });
+            repository.CheckoutTable(2, EmployeeRole.BARTENDER);
 
             Assert.AreEqual(1, numSaveCalls);
         }
