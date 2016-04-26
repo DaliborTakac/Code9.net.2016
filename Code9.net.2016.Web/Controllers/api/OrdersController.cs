@@ -20,7 +20,7 @@ namespace Code9.net._2016.Web.Controllers
             this.repository = repository;
         }
         // GET api/<controller>?table=<tablenum> or GET api/<controller>?kind=0|1 - table filter has precedence
-        public IEnumerable<Order> Get(OrderFilter filter)
+        public IEnumerable<Order> Get([FromUri] OrderFilter filter)
         {
             if (!ModelState.IsValid)
             {
