@@ -1,0 +1,33 @@
+﻿@model Code9.net._2016.Web.Models.OrderGroup
+
+<div class="panel panel-default">
+    <div class="panel-heading">@Model.GroupPrefix</div>
+    <div class="panel-body">
+        @for ( int i=0; i<Model.Orders.Count; ++i)
+        {
+            <div class="row row-space">
+                <div class="col-sm-6">
+                    <div class="row row-space">
+                        <div class="col-xs-8">@Model.Orders[i].DisplayName</div>
+                        <div class="col-xs-4 text-right">@Model.Orders[i].Price</div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="row row-space menu-item">
+                        @Html.Hidden(Model.GroupPrefix + ".Orders[" + i + "].ID", Model.Orders[i].ID)
+                        @Html.Hidden(Model.GroupPrefix + ".Orders[" + i + "].Quantity", Model.Orders[i].Quantity, new { @class = "quantity"})
+                        <div class="col-xs-3 quantity-display">0</div>
+                        <div class="col-xs-9 text-right">
+                            <a href="#" class="btn btn-primary increase">
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </a>
+                            <a href="#" class="btn btn-primary decrease disabled">
+                                <span class="glyphicon glyphicon-minus"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

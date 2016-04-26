@@ -1,0 +1,35 @@
+﻿@model IEnumerable<Code9.net._2016.Web.Models.Order>
+
+<div class="panel panel-default">
+    <div class="panel-heading">Orders</div>
+    <div class="panel-body">
+        @foreach (var item in Model)
+        {
+            <div class="row row-space">
+                <div class="col-sm-6">
+                    <div class="row row-space">
+                        <div class="col-xs-8">@item.DisplayName</div>
+                        <div class="col-xs-4 text-right">@item.Quantity</div>
+                    </div>
+                </div>
+                @if (!item.Delivered)
+                {
+                    <div class="col-sm-6">
+                        <div class="row row-space order-item" data-value="@item.ID">
+                            <div class="col-xs-9 text-right">
+                                <a href="#" class="btn btn-primary remove" data-role="button">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                </a>
+                            </div>
+                            <div class="col-xs-3">
+                                <a href="#" class="btn btn-primary deliver" data-role="button">
+                                    <span class="glyphicon glyphicon-thumbs-up"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

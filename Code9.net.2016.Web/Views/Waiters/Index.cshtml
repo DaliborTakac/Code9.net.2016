@@ -1,0 +1,29 @@
+﻿@model Code9.net._2016.Web.Models.OrdersModel
+
+@{
+    ViewBag.Title = "Waiters";
+}
+
+<h2>Orders for @Model.Table.DisplayName</h2>
+
+@using (Html.BeginForm("SubmitOrder", "Waiters", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.Table.Number)
+    @Html.Partial("MenuSection", Model.Drinks)
+    @Html.Partial("MenuSection", Model.Meals)
+
+    <div class="well well-lg text-right">
+        <button type="submit" class="btn btn-primary">
+            Submit order
+            <span class="glyphicon glyphicon-ok"></span>
+        </button>
+        <a href="@Url.Action("Index", "Checkout", new { ID = Model.Table.Number })" class="btn btn-primary">
+            Checkout
+            <span class="glyphicon glyphicon-off"></span>
+        </a>
+    </div>
+}
+
+@section scripts {
+    @Scripts.Render("~/bundles/menu-panels");
+}

@@ -1,0 +1,61 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+.restourant-table-legend
+{
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+.restourant-table-legend li {
+    display: block;
+    float: left;
+    margin: 8px;
+}
+
+.restourant-table-legend li:nth-child(3n+1)
+{
+    clear: left;
+}
+
+.restourant-table-legend a,
+.restourant-table-legend a:hover,
+.restourant-table-legend a:active
+{
+    display: block;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #ff6a00;
+    text-align: center;
+    line-height: 50px;
+    color: white;
+    font-size: 16px;
+}
+
+.row-space {
+    margin-bottom: 0.25em;
+}

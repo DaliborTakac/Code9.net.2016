@@ -1,0 +1,38 @@
+﻿@model Code9.net._2016.Web.Models.CheckoutModel
+
+@{
+    ViewBag.Title = "Checkout";
+}
+
+<h2>Checkout</h2>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>Orders for table @Model.Table</h3>
+    </div>
+    <div class="panel-body">
+        @foreach (var item in Model.Orders)
+        {
+            <div class="row row-space">
+                <div class="col-xs-4">@item.Item.DisplayName</div>
+                <div class="col-xs-5 text-right">@item.Item.Price x @item.Quantity</div>
+                <div class="col-xs-3 text-right">@(item.Item.Price * item.Quantity)</div>
+            </div>
+        }
+        <div class="row row-space">
+            <div class="col-xs-12 text-right">Total: @Model.Total</div>
+        </div>
+        <div class="row row-space">
+            <div class="col-xs-12">
+                <div class="well well-sm text-right">
+                    @using (Html.BeginForm("Checkout", "Checkout", new { ID = Model.Table }, FormMethod.Post))
+                    {
+                        <button type="submit" class="btn btn-primary">
+                            Finish 
+                            <span class="glyphicon glyphicon-ok"></span>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

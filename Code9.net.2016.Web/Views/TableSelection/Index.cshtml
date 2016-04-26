@@ -1,0 +1,12 @@
+﻿@model Code9.net._2016.Web.Models.TableSelectionModel
+
+<a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    @(Model.Selected != null ? Model.Selected.DisplayName : "Choose table")
+    <span class="caret"></span>
+</a>
+<ul class="dropdown-menu">
+    @foreach (var table in Model.Tables)
+    {
+        <li><a href="@Url.Action("SetTable", new { ID = table.Number})" class="table-select" role="button" data-value="@table.Number">@table.DisplayName</a></li>
+    }
+</ul>
