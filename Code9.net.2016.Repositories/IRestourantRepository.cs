@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Code9.net._2016.Repositories
 {
-    public interface IRestourantRepository : IDisposable
+    public interface IRestourantRepository
     {
 
         /// <summary>
@@ -40,13 +40,33 @@ namespace Code9.net._2016.Repositories
         MenuItem GetMenuItemByID(int ID);
 
         /// <summary>
+        /// Get orderitem by specified ID
+        /// </summary>
+        /// <param name="ID">filtering ID</param>
+        /// <returns>found OrderItem instance if exists, null ifthere's no match</returns>
+        OrderItem GetOrderByID(int ID);
+
+        /// <summary>
+        /// Updates existing menu item
+        /// </summary>
+        /// <param name="item">item to be updated</param>
+        void UpdateMenuItem(MenuItem item);
+
+        /// <summary>
+        /// Updates existing order item
+        /// </summary>
+        /// <param name="item">item to be updated</param>
+        void UpdateOrderItem(OrderItem item);
+
+        /// <summary>
         /// Modifies menu by adding new menu item
         /// </summary>
         /// <param name="name">name of item</param>
         /// <param name="price">price of one unit of item</param>
         /// <param name="kind">item kind</param>
         /// <param name="worker">person making the change</param>
-        void AddMenuItemToMenu(string name, double price, MenuItemKind kind, EmployeeRole worker);
+        /// <returns>newly created menu item (with proper id field filled in)</returns>
+        MenuItem AddMenuItemToMenu(string name, double price, MenuItemKind kind, EmployeeRole worker);
 
         /// <summary>
         /// Adds new orders for table

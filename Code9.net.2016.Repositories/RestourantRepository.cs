@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Code9.net._2016.Repositories
 {
-    public class RestourantRepository : IRestourantRepository, IDisposable
+    public class RestourantRepository : IRestourantRepository
     {
         protected IRestourantContext restourantContext;
 
@@ -39,11 +39,11 @@ namespace Code9.net._2016.Repositories
         public IEnumerable<MenuItem> GetMenuForItemKind(MenuItemKind kind)
         {
             return (from m in restourantContext.MenuItems
-                   where m.Kind == kind
+                   where m.Kind == kind && m.Active
                    orderby m.DisplayName
                    select m).ToList();
             //return restourantContext.MenuItems
-            //    .Where(m => m.Kind == kind)
+            //    .Where(m => m.Kind == kind && m.Active)
             //    .OrderBy(m => m.DisplayName);
         }
 
@@ -53,7 +53,42 @@ namespace Code9.net._2016.Repositories
                 .Find(ID);
         }
 
-        public void AddMenuItemToMenu(string name, double price, MenuItemKind kind, EmployeeRole worker)
+        public OrderItem GetOrderByID(int ID)
+        {
+            return restourantContext.OrdersWithMenu
+                .SingleOrDefault(item => item.ID == ID);
+        }
+
+        public void UpdateMenuItem(MenuItem item)
+        {
+            var existing = restourantContext.MenuItems.Find(item.ID);
+            if (existing == null)
+            {
+                throw new ArgumentException("Specified item is not in the system", nameof(item));
+            }
+            existing.DisplayName = item.DisplayName;
+            existing.Kind = item.Kind;
+            existing.Price = item.Price;
+            existing.Active = item.Active;
+            restourantContext.SaveChanges();
+        }
+
+        public void UpdateOrderItem(OrderItem item)
+        {
+            var existing = restourantContext.OrdersWithMenu.SingleOrDefault(o => o.ID == item.ID);
+            if (existing == null)
+            {
+                throw new ArgumentException("Specified item in not in the system", nameof(item));
+            }
+            existing.Item = item.Item;
+            existing.Payed = item.Payed;
+            existing.Quantity = item.Quantity;
+            existing.Table = item.Table;
+            existing.Delivered = item.Delivered;
+            restourantContext.SaveChanges();
+        }
+
+        public MenuItem AddMenuItemToMenu(string name, double price, MenuItemKind kind, EmployeeRole worker)
         {
             if (worker!=EmployeeRole.BARTENDER && worker!=EmployeeRole.COOK)
             {
@@ -63,10 +98,12 @@ namespace Code9.net._2016.Repositories
             {
                 DisplayName = name,
                 Price = price,
-                Kind = kind
+                Kind = kind,
+                Active = true
             };
             restourantContext.MenuItems.Add(menuItem);
             restourantContext.SaveChanges();
+            return menuItem;
         }
 
         public void AddOrdersForTableByWorker(IEnumerable<SubmittedOrderItem> orders, int table, EmployeeRole worker)
@@ -146,11 +183,6 @@ namespace Code9.net._2016.Repositories
                 order.Payed = true;
             }
             restourantContext.SaveChanges();
-        }
-
-        public void Dispose()
-        {
-            restourantContext.Dispose();
         }
     }
 }

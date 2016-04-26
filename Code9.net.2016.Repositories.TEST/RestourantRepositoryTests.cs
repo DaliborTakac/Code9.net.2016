@@ -151,14 +151,16 @@ namespace Code9.net._2016.Repositories.TEST
                 DisplayName = "test drink",
                 Kind = MenuItemKind.DRINK,
                 ID = 2,
-                Price = 10.00
+                Price = 10.00,
+                Active = true,
             });
             menu.Add(new MenuItem()
             {
                 DisplayName = "test meal",
                 Kind = MenuItemKind.MEAL,
                 ID = 5,
-                Price = 25.00
+                Price = 25.00,
+                Active = true
             });
 
             var mockContext = new MockDBContextFactory().WithBuiltinMenuItems(menu).Create();
@@ -224,6 +226,53 @@ namespace Code9.net._2016.Repositories.TEST
             Assert.AreEqual(8, m.ID);
         }
         #endregion GetMenuItemByID
+
+        #region GetOrderByID
+        [TestMethod]
+        public void GetOrderByID_returns_null_if_no_item_with_matching_id_exists()
+        {
+            var orders = new List<OrderItem>();
+            orders.Add(new OrderItem()
+            {
+                ID = 1
+            });
+            orders.Add(new OrderItem()
+            {
+                ID = 5
+            });
+
+            var mockContext = new MockDBContextFactory().WithBuiltinOrderItems(orders).Create();
+
+            var repository = new RestourantRepository(mockContext);
+
+            var order = repository.GetOrderByID(2);
+
+            Assert.IsNull(order);
+        }
+
+        [TestMethod]
+        public void GetOrderByID_returns_matching_item()
+        {
+            var orders = new List<OrderItem>();
+            orders.Add(new OrderItem()
+            {
+                ID = 1
+            });
+            orders.Add(new OrderItem()
+            {
+                ID = 5
+            });
+
+            var mockContext = new MockDBContextFactory().WithBuiltinOrderItems(orders).Create();
+
+            var repository = new RestourantRepository(mockContext);
+
+            var order = repository.GetOrderByID(5);
+
+            Assert.IsNotNull(order);
+            Assert.AreEqual(5, order.ID);
+        }
+        #endregion GetOrderByID
 
         #region AddMenuItemToMenu
         [TestMethod]
@@ -596,5 +645,114 @@ namespace Code9.net._2016.Repositories.TEST
             Assert.AreEqual(1, numSaveCalls);
         }
         #endregion CheckoutTable
+
+        #region UpdateMenuItem
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void UpdateMenuItem_failes_when_item_does_not_exist()
+        {
+            var menu = new List<MenuItem>();
+            menu.Add(new MenuItem()
+            {
+                ID = 1,
+                Active = true,
+                DisplayName = "test",
+                Kind = MenuItemKind.DRINK,
+                Price = 100.00
+            });
+
+            var mockContext = new MockDBContextFactory().WithBuiltinMenuItems(menu).Create();
+
+            var repository = new RestourantRepository(mockContext);
+
+            repository.UpdateMenuItem(new MenuItem() { ID = 5 });
+        }
+
+        [TestMethod]
+        public void UpdatemenuItem_updates_all_fields_and_calls_save_changes()
+        {
+            var menu = new List<MenuItem>();
+            menu.Add(new MenuItem()
+            {
+                ID = 1,
+                Active = true,
+                DisplayName = "test",
+                Kind = MenuItemKind.DRINK,
+                Price = 100.00
+            });
+
+            var numSaveCalls = 0;
+
+            var mockContext = new MockDBContextFactory().WithBuiltinMenuItems(menu).WithSaveChangesCallback(() => ++numSaveCalls).Create();
+
+            var repository = new RestourantRepository(mockContext);
+
+            var itemToUpdate = new MenuItem()
+            {
+                DisplayName = "test2", Active = true, Kind = MenuItemKind.MEAL, Price = 299.99, ID = 1
+            };
+
+            repository.UpdateMenuItem(itemToUpdate);
+
+            Assert.AreEqual(itemToUpdate.DisplayName, menu[0].DisplayName);
+            Assert.AreEqual(itemToUpdate.Active, menu[0].Active);
+            Assert.AreEqual(itemToUpdate.Kind, menu[0].Kind);
+            Assert.AreEqual(itemToUpdate.Price, menu[0].Price);
+            Assert.AreEqual(1, numSaveCalls);
+        }
+        #endregion UpdateMenuItem
+
+        #region UpdateOrderItem
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void UpdateOrderItem_fails_when_item_has_ivalid_id()
+        {
+            var orders = new List<OrderItem>();
+            orders.Add(new OrderItem
+            {
+                ID = 1,
+                Delivered = false,
+                Item = null,
+                Payed = false,
+                Quantity = 1,
+                Table = 12
+            });
+
+            var mockContext = new MockDBContextFactory().WithBuiltinOrderItems(orders).Create();
+            var repository = new RestourantRepository(mockContext);
+
+            repository.UpdateOrderItem(new OrderItem() { ID = 2 });
+        }
+
+        [TestMethod]
+        public void UpdateOrderItem_updates_all_fields_and_calls_save_changes()
+        {
+            var orders = new List<OrderItem>();
+            orders.Add(new OrderItem
+            {
+                ID = 1,
+                Delivered = false,
+                Item = null,
+                Payed = false,
+                Quantity = 1,
+                Table = 12
+            });
+
+            var numSaveCalls = 0;
+
+            var mockContext = new MockDBContextFactory().WithBuiltinOrderItems(orders).WithSaveChangesCallback(() => ++numSaveCalls).Create();
+
+            var repository = new RestourantRepository(mockContext);
+
+            repository.UpdateOrderItem(new OrderItem() { ID = 1, Delivered = true, Item = new MenuItem(), Payed = true, Quantity = 2, Table = 5 });
+
+            Assert.IsTrue(orders[0].Delivered);
+            Assert.IsNotNull(orders[0].Item);
+            Assert.IsTrue(orders[0].Payed);
+            Assert.AreEqual(2, orders[0].Quantity);
+            Assert.AreEqual(5, orders[0].Table);
+            Assert.AreEqual(1, numSaveCalls);
+        }
+        #endregion UpdateOrderItem
     }
 }
