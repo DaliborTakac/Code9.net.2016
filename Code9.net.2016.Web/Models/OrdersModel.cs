@@ -26,6 +26,5 @@ namespace Code9.net._2016.Web.Models
         public Table Table { get; set; }
         public OrderGroup Drinks { get; set; }
         public OrderGroup Meals { get; set; }
-        public IList<Order> Orders { get; set; }
     }
 }

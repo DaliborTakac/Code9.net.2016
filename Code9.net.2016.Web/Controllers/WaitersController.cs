@@ -53,7 +53,6 @@ namespace Code9.net._2016.Web.Controllers
             }
 
             var table = Session.GetActiveTable();
-            model.Orders = new List<Order>();
             if (table >= 0)
             {
                 model.Table = new Table()
@@ -61,17 +60,6 @@ namespace Code9.net._2016.Web.Controllers
                     DisplayName = "Table #" + table,
                     Number = table
                 };
-                var orders = repository.GetOpenOrdersForTable(table);
-                foreach (var item in orders)
-                {
-                    var order = new Order();
-                    order.ID = item.ID;
-                    order.DisplayName = item.Item.DisplayName;
-                    order.Price = item.Item.Price;
-                    order.Quantity = item.Quantity;
-                    order.Delivered = item.Delivered;
-                    model.Orders.Add(order);
-                }
             } else
             {
                 model.Table = new Table()
