@@ -90,6 +90,7 @@ namespace Code9.net._2016.Web.Controllers.api
         }
 
         // POST api/<controller>/
+        [HttpPost]
         public IHttpActionResult Post([FromBody]Menu value)
         {
             if (!Enum.IsDefined(typeof(MenuItemKind), value.Kind))
@@ -107,13 +108,15 @@ namespace Code9.net._2016.Web.Controllers.api
                     Name = menuItem.DisplayName,
                     Price = menuItem.Price
                 });
-            } else
+            }
+            else
             {
                 return BadRequest(ModelState);
             }
         }
 
         // PUT api/<controller>/5
+        [HttpPut]
         public void Put([FromBody]Menu value)
         {
             if (!ModelState.IsValid)
@@ -133,6 +136,7 @@ namespace Code9.net._2016.Web.Controllers.api
         }
 
         // DELETE api/<controller>/5
+        [HttpDelete]
         public void Delete(int id)
         {
             var item = repository.GetMenuItemByID(id);
