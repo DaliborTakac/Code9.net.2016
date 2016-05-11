@@ -9,7 +9,7 @@ namespace Code9.net._2016.data.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
         }
 
         protected override void Seed(Code9.net._2016.data.RestourantContext context)

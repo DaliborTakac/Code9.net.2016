@@ -28,5 +28,11 @@ namespace Code9.net._2016.data
                 return Orders.Include(o => o.Item);
             }
         }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<RestourantContext, Migrations.Configuration>());
+        }
     }
 }
