@@ -70,42 +70,5 @@ namespace Code9.net._2016.Web.Controllers
             }
             return View(model);
         }
-
-        [HttpPost]
-        public ActionResult SubmitOrder(OrdersModel model)
-        {
-            var orders = new List<SubmittedOrderItem>();
-            foreach (var item in model.Drinks.Orders)
-            {
-                if (item.Quantity > 0)
-                {
-                    orders.Add(new SubmittedOrderItem()
-                    {
-                        MenuItemID = item.ID,
-                        Quantity = item.Quantity
-                    });
-                }
-            }
-            foreach (var item in model.Meals.Orders)
-            {
-                if (item.Quantity > 0)
-                {
-                    orders.Add(new SubmittedOrderItem()
-                    {
-                        MenuItemID = item.ID,
-                        Quantity = item.Quantity
-                    });
-                }
-            }
-            try
-            {
-                repository.AddOrdersForTableByWorker(orders, model.Table.Number, EmployeeRole.WAITER);
-            }
-            catch (ArgumentException ex)
-            {
-                return View("Error");
-            }
-            return RedirectToAction("Index");
-        }
     }
 }

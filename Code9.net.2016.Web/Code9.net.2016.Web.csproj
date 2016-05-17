@@ -169,26 +169,17 @@
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="App_Start\UnityWebApiActivator.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\api\MenuController.cs" />
-    <Compile Include="Controllers\CheckoutController.cs" />
     <Compile Include="Controllers\WaitersController.cs" />
-    <Compile Include="Controllers\api\OrdersController.cs" />
     <Compile Include="Controllers\TableSelectionController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\api\Menu.cs" />
-    <Compile Include="Models\api\Order.cs" />
-    <Compile Include="Models\api\OrderFilter.cs" />
-    <Compile Include="Models\CheckoutModel.cs" />
     <Compile Include="Models\OrdersModel.cs" />
     <Compile Include="Models\TableSelectionModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utilities\ScriptStatusErrors.cs" />
     <Compile Include="Utilities\SessionManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="apitest.html" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="favicon.ico" />
@@ -227,9 +218,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Waiters\Index.cshtml" />
-    <Content Include="Views\Checkout\Index.cshtml" />
     <Content Include="Views\TableSelection\Index.cshtml" />
-    <Content Include="Views\Shared\MenuSection.cshtml" />
     <Content Include="Views\Shared\OrderSection.cshtml" />
   </ItemGroup>
   <ItemGroup>

@@ -9,8 +9,68 @@
 @using (Html.BeginForm("SubmitOrder", "Waiters", FormMethod.Post))
 {
     @Html.HiddenFor(m => m.Table.Number)
-    @Html.Partial("MenuSection", Model.Drinks)
-    @Html.Partial("MenuSection", Model.Meals)
+    <div class="panel panel-default">
+        <div class="panel-heading">@Model.Drinks.GroupPrefix</div>
+        <div class="panel-body">
+            @for (int i = 0; i < Model.Drinks.Orders.Count; ++i)
+            {
+                <div class="row row-space">
+                    <div class="col-sm-6">
+                        <div class="row row-space">
+                            <div class="col-xs-8">@Model.Drinks.Orders[i].DisplayName</div>
+                            <div class="col-xs-4 text-right">@Model.Drinks.Orders[i].Price</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="row row-space menu-item">
+                            @Html.HiddenFor(m => m.Drinks.Orders[i].ID)
+                            @Html.HiddenFor(m => m.Drinks.Orders[i].Quantity, new { @class="quantity" })
+                            <div class="col-xs-3 quantity-display">0</div>
+                            <div class="col-xs-9 text-right">
+                                <a href="#" class="btn btn-primary increase">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </a>
+                                <a href="#" class="btn btn-primary decrease disabled">
+                                    <span class="glyphicon glyphicon-minus"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">@Model.Meals.GroupPrefix</div>
+        <div class="panel-body">
+            @for (int i = 0; i < Model.Meals.Orders.Count; ++i)
+            {
+                <div class="row row-space">
+                    <div class="col-sm-6">
+                        <div class="row row-space">
+                            <div class="col-xs-8">@Model.Meals.Orders[i].DisplayName</div>
+                            <div class="col-xs-4 text-right">@Model.Meals.Orders[i].Price</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="row row-space menu-item">
+                            @Html.HiddenFor(m => m.Meals.Orders[i].ID)
+                            @Html.HiddenFor(m => m.Meals.Orders[i].Quantity, new { @class = "quantity" })
+                            <div class="col-xs-3 quantity-display">0</div>
+                            <div class="col-xs-9 text-right">
+                                <a href="#" class="btn btn-primary increase">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </a>
+                                <a href="#" class="btn btn-primary decrease disabled">
+                                    <span class="glyphicon glyphicon-minus"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
 
     <div class="well well-lg text-right">
         <button type="submit" class="btn btn-primary">
@@ -22,8 +82,4 @@
             <span class="glyphicon glyphicon-off"></span>
         </a>
     </div>
-}
-
-@section scripts {
-    @Scripts.Render("~/bundles/menu-panels");
 }

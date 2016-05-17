@@ -27,9 +27,9 @@ namespace Code9.net._2016.Web
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
 
-            bundles.Add(new ScriptBundle("~/bundles/menu-panels").Include(
-                        "~/Scripts/Quantity.js",
-                        "~/Scripts/MenuSectionPanelHandlers.js"));
+            //bundles.Add(new ScriptBundle("~/bundles/menu-panels").Include(
+            //            "~/Scripts/Quantity.js",
+            //            "~/Scripts/MenuSectionPanelHandlers.js"));
         }
     }
 }

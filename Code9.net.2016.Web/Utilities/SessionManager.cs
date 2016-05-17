@@ -20,7 +20,7 @@ namespace Code9.net._2016.Web.Utilities
             var table = session[SELECTED_TABLE_KEY];
             if (table == null)
             {
-                return -1;
+                return 1;
             } else
             {
                 return (int)table;
