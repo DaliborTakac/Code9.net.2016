@@ -171,6 +171,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\api\MenuController.cs" />
     <Compile Include="Controllers\CheckoutController.cs" />
+    <Compile Include="Controllers\CooksController.cs" />
     <Compile Include="Controllers\WaitersController.cs" />
     <Compile Include="Controllers\api\OrdersController.cs" />
     <Compile Include="Controllers\TableSelectionController.cs" />
@@ -231,6 +232,7 @@
     <Content Include="Views\TableSelection\Index.cshtml" />
     <Content Include="Views\Shared\MenuSection.cshtml" />
     <Content Include="Views\Shared\OrderSection.cshtml" />
+    <Content Include="Views\Cooks\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

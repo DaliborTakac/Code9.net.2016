@@ -412,7 +412,7 @@ namespace Code9.net._2016.Repositories.TEST
         #region FulfillOrder
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void FulfillOrder_failes_when_worker_is_cook()
+        public void FulfillOrder_failes_when_worker_is_waiter()
         {
             var orders = new List<OrderItem>();
             orders.Add(new OrderItem()
@@ -427,7 +427,7 @@ namespace Code9.net._2016.Repositories.TEST
 
             var repository = new RestourantRepository(mockContext);
 
-            repository.FulfillOrder(orders[0].ID, EmployeeRole.COOK);
+            repository.FulfillOrder(orders[0].ID, EmployeeRole.WAITER);
         }
 
         [TestMethod]
@@ -447,7 +447,7 @@ namespace Code9.net._2016.Repositories.TEST
 
             var repository = new RestourantRepository(mockContext);
 
-            repository.FulfillOrder(orders[0].ID, EmployeeRole.WAITER);
+            repository.FulfillOrder(orders[0].ID, EmployeeRole.COOK);
         }
 
         [TestMethod]
@@ -467,7 +467,7 @@ namespace Code9.net._2016.Repositories.TEST
 
             var repository = new RestourantRepository(mockContext);
 
-            repository.FulfillOrder(15, EmployeeRole.WAITER);
+            repository.FulfillOrder(15, EmployeeRole.COOK);
         }
 
         [TestMethod]

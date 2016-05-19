@@ -133,7 +133,7 @@ namespace Code9.net._2016.Repositories
 
         public void FulfillOrder(int orderID, EmployeeRole worker)
         {
-            if (worker==EmployeeRole.COOK)
+            if (worker==EmployeeRole.WAITER)
             {
                 throw new ArgumentException("Specified employee can't fulfill orders", nameof(worker));
             }
