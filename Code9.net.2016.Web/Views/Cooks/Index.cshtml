@@ -1,0 +1,26 @@
+﻿@model Code9.net._2016.Web.Models.Order[]
+
+@{
+    ViewBag.Title = "Cooks";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">Unfulfiled meals</div>
+    <div class="panel-body">
+        @for (var i = 0; i < Model.Length; ++i)
+        {
+            <div class="row">
+                <div class="row-space">
+                    <div class="col-xs-6">@Model[i].DisplayName</div>
+                    <div class="col-xs-3">@Model[i].Quantity</div>
+                    <div class="col-xs-3">
+                        @using (Html.BeginForm("FulfillOrder", "Cooks", new { id = Model[i].ID }, FormMethod.Post))
+                        {
+                            <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-ok"></span>Fulfill</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
